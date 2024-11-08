@@ -1,0 +1,28 @@
+import tensorflow as tf
+from tensorflow.keras import layers, models
+from tensorflow.keras.datasets import cifar10
+from tensorflow.keras.utils import to_categorical
+import numpy as np
+import matplotlib.pyplot as plt
+from tensorflow.keras.layers import Flatten, Dense
+from tensorflow.keras.models import Sequential
+import time
+(x_train, y_train), (x_test, y_test) = cifar10.load_data()
+x_train, x_test = x_train / 255.0, x_test / 255.0    #Normalization
+y_train, y_test = to_categorical(y_train), to_categorical(y_test) # one hot encoding
+basemodel = Sequential([
+    Flatten(input_shape=(32, 32, 3)),
+    Dense(256, activation='relu'),  # Hidden Layer 1
+    Dense(128, activation='relu'),  # Hidden Layer 2
+    Dense(64, activation='relu'),   # Hidden Layer 3
+    Dense(10, activation='softmax') # Output Layer
+])
+basemodel.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+st=time.time()
+history = basemodel.fit(x_train, y_train, epochs=5, batch_size=64, validation_data=(x_test, y_test))
+et=time.time()
+basetest_loss, basetest_acc = basemodel.evaluate(x_test, y_test)
+duration=et-st
+print(f"Duration:{duration:.4f}")
+print(f"Test accuracy: {basetest_acc:.4f}")
+print(f"Test loss: {basetest_loss:.4f}")
